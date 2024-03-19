@@ -8,20 +8,25 @@ let snap = new Midtrans.Snap({
 });
 
 export async function POST(request) {
-  const { id, productName, price, quantity } = await request.json();
-  let parameter = {
-    item_details: {
-      name: productName,
-      price: price,
-      quantity: quantity,
-    },
-    transaction_details: {
-      order_id: id,
-      gross_amount: price * quantity,
-    },
-  };
+  try {
+    const { id, productName, price, quantity } = await request.json();
+    let parameter = {
+      item_details: {
+        name: productName,
+        price: price,
+        quantity: quantity,
+      },
+      transaction_details: {
+        order_id: id,
+        gross_amount: price * quantity,
+      },
+    };
 
-  const token = await snap.createTransactionToken(parameter);
-  console.log(token);
-  return NextResponse.json({ token });
+    const token = await snap.createTransactionToken(parameter);
+    console.log(token);
+    return NextResponse.json({ token });
+  } catch (error) {
+    console.error("Error occurred while processing transaction:", error);
+    return NextResponse.error("An error occurred while processing transaction.", { status: 500 });
+  }
 }

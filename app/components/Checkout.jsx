@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { product } from "../libs/product";
+
 const Checkout = () => {
   const [quantity, setQuantity] = useState(1);
 
@@ -19,12 +20,17 @@ const Checkout = () => {
       quantity: quantity,
     };
 
-    const response = await fetch("/api/tokenizer", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-    const requestData = await response.json()
-    console.log(requestData)
+    try {
+      const response = await fetch("/api/tokenizer", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      const requestData = await response.json();
+      window.snap.pay(requestData.token);
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      // Handle error, show error message to the user, etc.
+    }
   };
 
   const generatePaymentLink = async () => {
@@ -39,7 +45,13 @@ const Checkout = () => {
             ➖
           </button>
 
-          <input type="number" id="quantity" value={quantity} className="h-10 w-16 text-black border-transparent text-center" onChange={quantity} />
+          <input
+            type="number"
+            id="quantity"
+            value={quantity}
+            className="h-10 w-16 text-black border-transparent text-center"
+            onChange={quantity}
+          />
 
           <button className="transition-all hover:opacity-75" onClick={increaseQuantity}>
             ➕
